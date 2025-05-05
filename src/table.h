@@ -28,15 +28,24 @@ const uint32_t ROWS_PER_PAGE = PAGE_SIZE / ROW_SIZE;
 const uint32_t TABLE_MAX_ROWS = ROWS_PER_PAGE * TABLE_MAX_PAGES;
 
 typedef struct {
-    uint32_t num_rows;
+    int file_descriptor;
+    uint32_t file_length;
     void* pages[TABLE_MAX_PAGES];
+} Pager;
+
+typedef struct {
+    uint32_t num_rows;
+    Pager* pager;
 } Table;
 
 
 void serialize_row(Row* source, void* destination);
 void deserialize_row(void* source, Row* destination);
+void* get_page(Pager* pager, uint32_t page_num);
 void* row_slot(Table* table, uint32_t row_num);
-Table* new_table();
+Pager* pager_open(const char* filename);
+Table* db_open(const char* filename);
+void db_close(Table* table);
 void free_table(Table* table);
 
 #endif
