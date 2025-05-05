@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <corecrt.h>
 #include "include/db_input.h"
 
 InputBuffer* new_input_buffer() {

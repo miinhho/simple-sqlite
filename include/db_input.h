@@ -1,7 +1,7 @@
 #ifndef _DB_INPUT
 #define _DB_INPUT
 
-#include <unistd.h>
+#include <corecrt.h>
 
 typedef struct {
     char* buffer;
