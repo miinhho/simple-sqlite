@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "include/table.h"
 
 typedef enum {
     NODE_INTERNAL,
@@ -20,8 +21,10 @@ const uint8_t COMMON_NODE_HEADER_SIZE =
 
 NodeType get_node_type(void* node);
 void set_node_type(void* node, NodeType type);
-uint32_t get_node_max_key(void* node);
 bool is_node_root(void* node);
 void set_node_root(void* node, bool is_root);
+void create_new_root(Table* table, uint32_t right_child_page_num);
+uint32_t* node_parent(void* node);
+uint32_t get_node_max_key(void* node);
 
 #endif

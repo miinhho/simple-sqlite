@@ -31,7 +31,6 @@ typedef struct {
 
 void serialize_row(Row* source, void* destination);
 void deserialize_row(void* source, Row* destination);
-void create_new_root(Table* table, uint32_t right_child_page_num);
 Table* db_open(const char* filename);
 void db_close(Table* table);
 
