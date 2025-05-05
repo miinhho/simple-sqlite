@@ -7,6 +7,7 @@
 #include "include/leaf_node.h"
 #include "include/db_execute.h"
 
+
 ExecuteResult execute_insert(Statement* statement, Table* table) {
     void* node = get_page(table->pager, table->root_page_num);
     uint32_t num_cells = (*leaf_node_num_cells(node));

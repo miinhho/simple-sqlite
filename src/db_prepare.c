@@ -4,6 +4,7 @@
 #include "include/db_prepare.h"
 #include "include/db_input.h"
 
+
 PrepareResult prepare_insert(InputBuffer* input_buffer, Statement* statement) {
     statement->type = STATEMENT_INSERT;
 

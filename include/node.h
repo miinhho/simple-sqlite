@@ -23,8 +23,8 @@ NodeType get_node_type(void* node);
 void set_node_type(void* node, NodeType type);
 bool is_node_root(void* node);
 void set_node_root(void* node, bool is_root);
-void create_new_root(Table* table, uint32_t right_child_page_num);
 uint32_t* node_parent(void* node);
-uint32_t get_node_max_key(void* node);
+uint32_t get_node_max_key(Pager* pager, void* node);
+void create_new_root(Table* table, uint32_t right_child_page_num);
 
 #endif

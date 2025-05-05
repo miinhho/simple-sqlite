@@ -6,6 +6,7 @@
 #include "include/db_input.h"
 #include "include/print_tree.h"
 
+
 MetaCommandResult do_meta_command(InputBuffer* input_buffer, Table* table) {
     if (strcmp(input_buffer->buffer, ".exit") == 0) {
         close_input_buffer(input_buffer);

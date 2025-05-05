@@ -8,6 +8,7 @@
 #include "include/db_prepare.h"
 #include "include/db_command.h"
 
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         printf("Must supply a database filename.\n");

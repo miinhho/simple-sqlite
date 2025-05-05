@@ -9,6 +9,7 @@
 #include "include/internal_node.h"
 #include "include/page.h"
 
+
 void serialize_row(Row* source, void* destination) {
     memcpy(destination + ID_OFFSET, &(source->id), ID_SIZE);
     strncpy(destination + USERNAME_OFFSET, &(source->username), USERNAME_SIZE);

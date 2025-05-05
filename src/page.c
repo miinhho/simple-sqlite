@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include "include/page.h"
 
+
 uint32_t get_unused_page_num(Pager* pager) {
     return pager->num_pages;
 }

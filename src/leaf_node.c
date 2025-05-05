@@ -6,6 +6,7 @@
 #include "include/leaf_node.h"
 #include "include/internal_node.h"
 
+
 void* leaf_node_cell(void* node, uint32_t cell_num) {
     return node + LEAF_NODE_HEADER_SIZE + cell_num * LEAF_NODE_CELL_SIZE;
 }
