@@ -1,0 +1,10 @@
+file(GLOB_RECURES SOURCE_DIR CMAKE_CONFIGURE_DEPENDS "*.c")
+add_executable(${PROJECT_NAME} ${SOURCES})
+
+target_include_directories(
+    ${PROJECT_NAME}
+    PUBLIC_HEADER
+    ${CMAKE_SOURCE_DIR}/src
+    PRIVATE_HEADER
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
