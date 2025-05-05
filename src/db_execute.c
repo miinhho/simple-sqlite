@@ -1,19 +1,22 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "table.h"
 #include "cursor.h"
+#include "node.h"
 #include "db_input.h"
 #include "db_execute.h"
 
 ExecuteResult execute_insert(Statement* statement, Table* table) {
-    if (table->num_rows >= TABLE_MAX_ROWS) {
+    void* node = get_page(table->pager, table->root_page_num);
+    if ((*leaf_node_num_cells(node) >= LEAF_NODE_MAX_CELLS)) {
         return EXECUTE_TABLE_FULL;
     }
 
     Row* row_to_insert = &(statement->row_to_insert);
     Cursor* cursor = table_end(table);
 
-    serialize_row(row_to_insert, cursor_value(cursor));
-    table->num_rows += 1;
+    leaf_node_insert(cursor, row_to_insert->id, row_to_insert);
+    free(cursor);
 
     return EXECUTE_SUCCESS;
 }
@@ -40,11 +43,28 @@ ExecuteResult execute_statement(Statement* statement, Table* table) {
     }
 }
 
+void print_constants() {
+    printf("ROW_SIZE: %d\n", ROW_SIZE);
+    printf("COMMON_NODE_HEADER_SIZE: %d\n", COMMON_NODE_HEADER_SIZE);
+    printf("LEAF_NODE_HEADER_SIZE: %d\n", LEAF_NODE_HEADER_SIZE);
+    printf("LEAF_NODE_CELL_SIZE: %d\n", LEAF_NODE_CELL_SIZE);
+    printf("LEAF_NODE_SPACE_FOR_CELLS: %d\n", LEAF_NODE_SPACES_FOR_CELLS);
+    printf("LEAF_NODE_MAX_CELLS: %d\n", LEAF_NODE_MAX_CELLS);
+}
+
 MetaCommandResult do_meta_command(InputBuffer* input_buffer, Table* table) {
     if (strcmp(input_buffer->buffer, ".exit") == 0) {
         close_input_buffer(input_buffer);
         db_close(table);
         exit(EXIT_SUCCESS);
+    } else if (strcmp(input_buffer->buffer, ".btreee") == 0) {
+        printf("Tree:\n");
+        print_leaf_node(get_page(table->pager, 0));
+        return META_COMMAND_SUCCESS;
+    } else if (strcmp(input_buffer->buffer, ".constants") == 0) { 
+        printf("Constants:\n");
+        print_constants();
+        return META_COMMAND_SUCCESS;
     } else {
         return META_COMMAND_UNRECOGNIZED_COMMAND;
     }

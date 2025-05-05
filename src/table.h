@@ -24,19 +24,18 @@ const uint32_t EMAIL_OFFSET = USERNAME_OFFSET + USERNAME_SIZE;
 const uint32_t ROW_SIZE = ID_SIZE + USERNAME_SIZE + EMAIL_SIZE;
 
 const uint32_t PAGE_SIZE = 4096;
-#define TABLE_MAX_PAGES 100
-const uint32_t ROWS_PER_PAGE = PAGE_SIZE / ROW_SIZE;
-const uint32_t TABLE_MAX_ROWS = ROWS_PER_PAGE * TABLE_MAX_PAGES;
+const uint32_t TABLE_MAX_PAGES = 100;
 
 typedef struct {
     int file_descriptor;
     uint32_t file_length;
+    uint32_t num_pages;
     void* pages[TABLE_MAX_PAGES];
 } Pager;
 
 typedef struct {
-    uint32_t num_rows;
     Pager* pager;
+    uint32_t root_page_num;
 } Table;
 
 typedef struct {
