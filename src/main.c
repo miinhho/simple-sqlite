@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "table.h"
-#include "db_input.h"
-#include "db_execute.h"
+#include "include/table.h"
+#include "include/db_input.h"
+#include "include/db_execute.h"
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {

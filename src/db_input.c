@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "db_input.h"
+#include "include/db_input.h"
 
 InputBuffer* new_input_buffer() {
     InputBuffer* input_buffer = (InputBuffer*)malloc(sizeof(InputBuffer));

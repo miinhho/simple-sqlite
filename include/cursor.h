@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "table.h"
+#include "include/table.h"
 
 typedef struct {
     Table* table;

@@ -1,7 +1,7 @@
 #ifndef _DB_EXECUTE
 #define _DB_EXECUTE
 
-#include "table.h"
+#include "include/table.h"
 
 typedef enum {
     META_COMMAND_SUCCESS,

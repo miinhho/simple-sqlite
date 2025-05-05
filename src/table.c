@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include "table.h"
-#include "cursor.h"
-#include "node.h"
+#include <stdbool.h>
+#include "include/table.h"
+#include "include/cursor.h"
+#include "include/node.h"
+#include "include/internal_node.h"
+#include "include/page.h"
 
 void serialize_row(Row* source, void* destination) {
     memcpy(destination + ID_OFFSET, &(source->id), ID_SIZE);
@@ -20,84 +20,22 @@ void deserialize_row(void* source, Row* destination) {
     memcpy(&(destination->email), source + EMAIL_OFFSET, EMAIL_SIZE);
 }
 
-void* get_page(Pager* pager, uint32_t page_num) {
-    if (page_num > TABLE_MAX_PAGES) {
-        printf("Tried to fetch page number out of bounds. %d > %d\n", page_num, TABLE_MAX_PAGES);
-        exit(EXIT_FAILURE);
-    }
+void create_new_root(Table* table, uint32_t right_child_page_num) {
+    void* root = get_page(table->pager, table->root_page_num);
+    void* right_child = get_page(table->pager, right_child_page_num);
+    uint32_t left_child_page_num = get_unused_page_num(table->pager);
+    void* left_child = get_page(table->pager, left_child_page_num);
 
-    if (pager->pages[page_num] == NULL) {
-        void* page = malloc(PAGE_SIZE);
-        uint32_t num_pages = pager->file_length / PAGE_SIZE;
+    memcpy(left_child, root, PAGE_SIZE);
+    set_node_root(left_child, false);
 
-        if (pager->file_length % PAGE_SIZE) {
-            num_pages += 1;
-        }
-
-        if (page_num <= num_pages) {
-            lseek(pager->file_descriptor, page_num * PAGE_SIZE, SEEK_SET);
-            ssize_t bytes_read = read(pager->file_descriptor, page, PAGE_SIZE);
-            if (bytes_read == -1) {
-                printf("Error reading file: %d\n", errno);
-                exit(EXIT_FAILURE);
-            }
-        }
-
-        pager->pages[page_num] = page;
-
-        if (page_num >= pager->num_pages) {
-            pager->num_pages = page_num + 1;
-        }
-    }
-
-    return pager->pages[page_num];
-}
-
-Pager* pager_open(const char* filename) {
-    int fd = open(filename, O_RDWR | O_CREAT, S_IWUSR | S_IRUSR);
-    if (fd == -1) {
-        printf("Unable to open file\n");
-        exit(EXIT_FAILURE);
-    }
-
-    off_t file_length = lseek(fd, 0, SEEK_END);
-
-    Pager* pager = malloc(sizeof(Pager));
-    pager->file_descriptor = fd;
-    pager->file_length = file_length;
-    pager->num_pages = (file_length / PAGE_SIZE);
-
-    if (file_length % PAGE_SIZE != 0) {
-        printf("Db file is not a whole number of pages. Corrupt file.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    for (uint32_t i = 0; i < TABLE_MAX_PAGES; i++) {
-        pager->pages[i] = NULL;
-    }
-
-    return pager;
-}
-
-void pager_flush(Pager* pager, uint32_t page_num) {
-    if (pager->pages[page_num] == NULL) {
-        printf("Tried to flush null page\n");
-        exit(EXIT_FAILURE);
-    }
-
-    off_t offset = lseek(pager->file_descriptor, page_num * PAGE_SIZE, SEEK_SET);
-
-    if (offset == -1) {
-        printf("Error seeking: %d\n", errno);
-        exit(EXIT_FAILURE);
-    }
-
-    ssize_t bytes_written = write(pager->file_descriptor, pager->pages[page_num], PAGE_SIZE);
-
-    if (bytes_written == -1) {
-        printf("Error writing: %d\n", errno);
-        exit(EXIT_FAILURE);
-    }
+    initialize_leaf_node(root);
+    set_node_root(root, true);
+    *internal_node_num_keys(root) = 1;
+    *internal_node_child(root, 0) = left_child_page_num;
+    uint32_t left_child_max_key = get_node_max_key(left_child);
+    *internal_node_key(root, 0) = left_child_max_key;
+    *internal_node_right_child(root) = right_child_page_num;
 }
 
 Table* db_open(const char* filename) {
@@ -109,6 +47,7 @@ Table* db_open(const char* filename) {
     if (pager->num_pages == 0) {
         void* root_node = get_page(pager, 0);
         initialize_leaf_node(root_node);
+        set_node_root(root_node, true);
     }
 
     return table;
